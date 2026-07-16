@@ -1,1 +1,1 @@
-## AdAss - Ai Document Assistent
+## AdAss - AI Document Assistent 🚀🍑
