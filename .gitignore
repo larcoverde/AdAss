@@ -236,3 +236,5 @@ embeddings/
 
 # Model files (if you download local models)
 models/
+
+.pdf
