@@ -1,6 +1,7 @@
 # src/main.py
 
-import sys
+# TODO: Implement a chunk_text() function that splits extracted PDF text into overlapping chunks.
+
 import pymupdf
 
 def open_file():
