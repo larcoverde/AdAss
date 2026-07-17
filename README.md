@@ -1,4 +1,4 @@
-# AdAss - AI Document Assistent 🚀🍑
+# AdAss - AI Document Assistent
 
 ## About this project
 
