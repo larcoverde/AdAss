@@ -1,16 +1,16 @@
 # src/main.py
 
-# TODO: get a pdf file and extract text from it.
-
 import sys
 import pymupdf
 
 def open_file():
+    """Request a PDF file from user and open it."""
     filename = input("Enter file: ")
     doc = pymupdf.open(filename)
     return doc
 
 def get_text_from_page(doc):
+    """Extract text from provided PDF file."""
     for page in doc:
         text = page.get_text()
     return text
