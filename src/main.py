@@ -64,7 +64,10 @@ def chunk_text(text, chunk_size=500, overlap=50):
 # --- end Claude-generated function ---
 
 def generate_embeddings(text_chunks: list[str], model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-    model      = SentenceTransformer(model_name)
+    # Claude-generated: force CPU explicitly. On a laptop with no real GPU, NOTE: i actually wrote this funcion, claude just add device=cpu
+    # this avoids sentence-transformers auto-detecting/trying to use a GPU
+    # device that isn't actually usable.
+    model      = SentenceTransformer(model_name, device="cpu")
     embeddings = model.encode(text_chunks, show_progress_bar=True)
 
     return embeddings.tolist()
@@ -74,7 +77,16 @@ def main():
     text    = get_text_from_page(doc)
     chunks  = chunk_text(text)  # Claude-generated: wire chunk_text into main()
     vectors = generate_embeddings(chunks)
-    return chunks
+
+    # --- Claude-generated fix ---
+    # `vectors` was being computed but never returned or kept together with
+    # `chunks`, so every embedding was thrown away as soon as main() ended.
+    # Zipping them into a list of (chunk, vector) pairs keeps each chunk
+    # linked to its own embedding, which the upcoming similarity-search step
+    # needs (you have to know which chunk a matched vector belongs to).
+    chunks_with_vectors = list(zip(chunks, vectors))
+    return chunks_with_vectors
+    # --- end fix ---
 
 if __name__ == "__main__":
     main()
