@@ -1,6 +1,7 @@
 # src/main.py
 
 import pymupdf
+from sentence_transformers import SentenceTransformer
 
 def open_file():
     """Request a PDF file from user and open it."""
@@ -62,11 +63,17 @@ def chunk_text(text, chunk_size=500, overlap=50):
     return chunks
 # --- end Claude-generated function ---
 
+def generate_embeddings(text_chunks: list[str], model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    model      = SentenceTransformer(model_name)
+    embeddings = model.encode(text_chunks, show_progress_bar=True)
+
+    return embeddings.tolist()
+
 def main():
-    doc = open_file()
-    text = get_text_from_page(doc)
-    chunks = chunk_text(text)  # Claude-generated: wire chunk_text into main()
-    print(f"Extracted {len(chunks)} chunk(s) from the PDF.")
+    doc     = open_file()
+    text    = get_text_from_page(doc)
+    chunks  = chunk_text(text)  # Claude-generated: wire chunk_text into main()
+    vectors = generate_embeddings(chunks)
     return chunks
 
 if __name__ == "__main__":
