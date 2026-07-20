@@ -73,7 +73,7 @@ def generate_embeddings(text_chunks: list[str], model: SentenceTransformer):
     return embeddings.tolist()
 
 def embed_query(user_question: str, model: SentenceTransformer):
-    embedding = model.encode(user_question, show_progress_bar=True)
+    embedding = model.encode(user_question)
 
     return embedding.tolist()
 
