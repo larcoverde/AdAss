@@ -63,17 +63,16 @@ def chunk_text(text, chunk_size=500, overlap=50):
     return chunks
 # --- end Claude-generated function ---
 
-def generate_embeddings(text_chunks: list[str], model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-    # Claude-generated: force CPU explicitly. On a laptop with no real GPU, NOTE: i actually wrote this funcion, claude just add device=cpu
-    # this avoids sentence-transformers auto-detecting/trying to use a GPU
-    # device that isn't actually usable.
-    model      = SentenceTransformer(model_name, device="cpu")
+def load_model(model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    model = SentenceTransformer(model_name, device="cpu")
+    return model
+
+def generate_embeddings(text_chunks: list[str], model: SentenceTransformer):
     embeddings = model.encode(text_chunks)
 
     return embeddings.tolist()
 
-def embed_query(user_question: str, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-    model = SentenceTransformer(model_name, device="cpu")
+def embed_query(user_question: str, model: SentenceTransformer):
     embedding = model.encode(user_question, show_progress_bar=True)
 
     return embedding.tolist()
@@ -81,11 +80,14 @@ def embed_query(user_question: str, model_name: str = "sentence-transformers/all
 def main():
     """call other functions and make program work"""
 
+    # load LLM model
+    model               = load_model()
+
     # get pdf and chunk its text
     doc                 = open_file()
     text                = get_text_from_page(doc)
     chunks              = chunk_text(text)
-    vectors             = generate_embeddings(chunks)
+    vectors             = generate_embeddings(chunks, model)
     chunks_with_vectors = list(zip(chunks, vectors))
 
     # user question loop
@@ -94,7 +96,7 @@ def main():
         if user_question.lower().strip() == "exit":
             print("Exiting...")
             break
-        query_vector = embed_query(user_question)
+        query_vector = embed_query(user_question, model)
         # similarity search
 
 if __name__ == "__main__":
