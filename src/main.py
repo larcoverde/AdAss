@@ -68,7 +68,7 @@ def generate_embeddings(text_chunks: list[str], model_name: str = "sentence-tran
     # this avoids sentence-transformers auto-detecting/trying to use a GPU
     # device that isn't actually usable.
     model      = SentenceTransformer(model_name, device="cpu")
-    embeddings = model.encode(text_chunks, show_progress_bar=True)
+    embeddings = model.encode(text_chunks)
 
     return embeddings.tolist()
 
@@ -79,20 +79,23 @@ def embed_query(user_question: str, model_name: str = "sentence-transformers/all
     return embedding.tolist()
 
 def main():
-    doc     = open_file()
-    text    = get_text_from_page(doc)
-    chunks  = chunk_text(text)  # Claude-generated: wire chunk_text into main()
-    vectors = generate_embeddings(chunks)
+    """call other functions and make program work"""
 
-    # --- Claude-generated fix ---
-    # `vectors` was being computed but never returned or kept together with
-    # `chunks`, so every embedding was thrown away as soon as main() ended.
-    # Zipping them into a list of (chunk, vector) pairs keeps each chunk
-    # linked to its own embedding, which the upcoming similarity-search step
-    # needs (you have to know which chunk a matched vector belongs to).
+    # get pdf and chunk its text
+    doc                 = open_file()
+    text                = get_text_from_page(doc)
+    chunks              = chunk_text(text)
+    vectors             = generate_embeddings(chunks)
     chunks_with_vectors = list(zip(chunks, vectors))
-    return chunks_with_vectors
-    # --- end fix ---
+
+    # user question loop
+    while True:
+        user_question = input("-> ")
+        if user_question.lower().strip() == "exit":
+            print("Exiting...")
+            break
+        query_vector = embed_query(user_question)
+        # similarity search
 
 if __name__ == "__main__":
     main()
