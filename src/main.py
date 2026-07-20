@@ -72,6 +72,12 @@ def generate_embeddings(text_chunks: list[str], model_name: str = "sentence-tran
 
     return embeddings.tolist()
 
+def embed_query(user_question: str, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    model = SentenceTransformer(model_name, device="cpu")
+    embedding = model.encode(user_question, show_progress_bar=True)
+
+    return embedding.tolist()
+
 def main():
     doc     = open_file()
     text    = get_text_from_page(doc)
